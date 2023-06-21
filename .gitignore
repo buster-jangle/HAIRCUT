@@ -1,0 +1,19 @@
+
+# Ignore the build and lib dirs
+build
+cmake-build*
+lib/
+# Ignore any executables
+bin/
+
+# Ignore Mac specific files
+.DS_Store
+
+# Ignore CLion project directory
+.idea/
+
+#ignore logs
+*.log
+
+#ignore auto-generated documentation
+doxygen/
