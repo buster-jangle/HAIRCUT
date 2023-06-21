@@ -1,4 +1,4 @@
-# PROGENY_PROJECT_NAME
+# HAIRCUT
 ![build badge](https://github.com/buster-jangle/PROGENY/actions/workflows/cmake_build_ubuntu-latest.yml/badge.svg?branch=master)
 ![build badge](https://github.com/buster-jangle/PROGENY/actions/workflows/cmake_tests_ubuntu-latest.yml/badge.svg?branch=master)
 ![build badge](https://github.com/buster-jangle/PROGENY/actions/workflows/doxygen-gh-pages.yml/badge.svg?branch=master)
@@ -26,7 +26,7 @@ Template includes the following:
 * Click "Use this template" to create your new repo, and give it a name. 
 * Clone the repo to a local directory
 * Run `progeny.sh` to initialize the new project. This will automatically perform the following:
-  * Replace all occurences of "PROGENY_PROJECT_NAME" with your new project name.
+  * Replace all occurences of "HAIRCUT" with your new project name.
   * Add a creation date to template files with the current date
   * Reset the git repo
   * delete `progeny.sh`

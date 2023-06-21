@@ -1,6 +1,6 @@
 
 cmake_minimum_required (VERSION 2.8.13)
-project("PROGENY_PROJECT_NAME")
+project("HAIRCUT")
 
 #Enable testing with CTest
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)

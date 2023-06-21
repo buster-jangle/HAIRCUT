@@ -6,15 +6,15 @@ add_compile_options(-g) # -g turns on debugging
 
 find_package( Threads )
 
-add_executable("PROGENY_PROJECT_NAME-bin" src/main.cpp)
+add_executable("HAIRCUT-bin" src/main.cpp)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/inc/)
-target_link_libraries("PROGENY_PROJECT_NAME-bin" "PROGENY_PROJECT_NAME")
-target_link_libraries("PROGENY_PROJECT_NAME-bin" Threads::Threads)
-set_target_properties("PROGENY_PROJECT_NAME-bin" PROPERTIES OUTPUT_NAME "PROGENY_PROJECT_NAME")
+target_link_libraries("HAIRCUT-bin" "HAIRCUT")
+target_link_libraries("HAIRCUT-bin" Threads::Threads)
+set_target_properties("HAIRCUT-bin" PROPERTIES OUTPUT_NAME "HAIRCUT")
 
 if(DEFINED PRIMARY_EXECUTABLE_INSTALL_PATH)
     message(STATUS "Will install primary executables at ${PRIMARY_EXECUTABLE_INSTALL_PATH}")
-    install(TARGETS PROGENY_PROJECT_NAME-bin DESTINATION ${PRIMARY_EXECUTABLE_INSTALL_PATH})
+    install(TARGETS HAIRCUT-bin DESTINATION ${PRIMARY_EXECUTABLE_INSTALL_PATH})
 else()
     message(STATUS "No primary executable install path defined")
 endif()

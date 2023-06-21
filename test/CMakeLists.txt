@@ -7,7 +7,7 @@ find_package( Threads )
 
 add_executable("test_default" src/test_default.cpp)
 include_directories(${CMAKE_CURRENT_LIST_DIR})
-target_link_libraries(test_default PROGENY_PROJECT_NAME)
+target_link_libraries(test_default HAIRCUT)
 
 add_test(NAME test_default COMMAND test_default)
 
