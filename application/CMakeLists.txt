@@ -9,7 +9,7 @@ find_package( Threads )
 add_executable("HAIRCUT-bin" src/main.cpp)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/inc/)
 target_link_libraries("HAIRCUT-bin" "HAIRCUT")
-target_link_libraries("HAIRCUT-bin" Threads::Threads)
+target_link_libraries("HAIRCUT-bin" Threads::Threads LimeSuite fftw)
 set_target_properties("HAIRCUT-bin" PROPERTIES OUTPUT_NAME "HAIRCUT")
 
 if(DEFINED PRIMARY_EXECUTABLE_INSTALL_PATH)
