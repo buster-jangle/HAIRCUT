@@ -28,6 +28,7 @@ endif()
 find_package( Threads )
 
 include_directories(${CMAKE_CURRENT_LIST_DIR})
+include_directories(/usr/include/python3.10/)
 
 
 ##### Turn each .cpp source file in ./src/ into a separate executable, and add it to the list of tests

@@ -34,10 +34,10 @@ int HAIRCUT::resample::init(int inputSize_i, int outputSize_i, int batchSize) {
             FFTW_PATIENT
     );
     fftInverse = fftwf_plan_dft_1d(
-            inputSize, // number of fft bins
+            outputSize, // number of fft bins
             (fftwf_complex*)inverseInBuffer,
             (fftwf_complex*)outBuffer[0].buffer,
-            FFTW_FORWARD,
+            FFTW_BACKWARD,
             FFTW_PATIENT
     );
     fftwPlannerMutex.unlock();
@@ -72,10 +72,17 @@ int HAIRCUT::resample::execute()  {
     fftwf_execute(fftForward); // execute forward fft
 
     ///// these operations will either leave a zero-padded gap in uper frequency bins for interpolation, or clip upper frequency bins for decmation
-    memcpy(inverseInBuffer, forwardOutBuffer, outputSize/2 * sizeof(f32_complex)); // copy lower half of frequency bins, and copy to the lower half of output
-    memcpy(inverseInBuffer + (outputSize/2), forwardOutBuffer + inputSize - ( outputSize/2), outputSize/2 * sizeof(f32_complex)); // grap the upper half of binsand copy to destination
+    memcpy(inverseInBuffer, forwardOutBuffer, (inputSize/2) * sizeof(f32_complex)); // copy lower half of frequency bins, and copy to the lower half of output
+    memcpy(inverseInBuffer + outputSize - (inputSize/2), forwardOutBuffer + inputSize - ( inputSize/2), (inputSize/2) * sizeof(f32_complex)); // grap the upper half of binsand copy to destination
 
-    fftwf_execute(fftForward); // execute inverse fft
+    fftwf_execute(fftInverse); // execute inverse fft
+    //memcpy(outBuffer[0].buffer, inverseInBuffer, outputSize * sizeof(f32_complex)); // debug show fft
+
+    float scalingFactor = (outputSize/inputSize) / ( (float)outputSize); // calculate a scale factor that preserves magnitude after FFT and IFFT
+    for(int i = 0; i < outputSize; ++i){
+        outBuffer[0].buffer[i].real *= scalingFactor; // rescale outputs
+        outBuffer[0].buffer[i].imag *= scalingFactor;
+    }
 
     outBuffer[0].occupation += outputSize;
     inBuffer[0].occupation -= inputSize; // udate buffer occupation according to how much data the operaton serviced

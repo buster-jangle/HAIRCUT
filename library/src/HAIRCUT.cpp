@@ -19,10 +19,7 @@
 
 using namespace std; // default namespace
 
-//HAIRCUT::HAIRCUT(){
-//    status = 0;
-//}
-//
+
 bool HAIRCUT::init(plog::IAppender* appender, plog::Severity severity){
     PLOGI << "initializing";
 

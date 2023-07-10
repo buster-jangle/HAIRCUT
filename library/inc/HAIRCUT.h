@@ -103,14 +103,21 @@ public:
         f32_complex* inverseInBuffer;
         fftwf_plan fftInverse;
 
-
-
-
         int execute() override;
         //int inChannels = 2;
     public:
 
         int init(int inputSize, int outputSize, int batchSize = 1);
+    };
+
+    class callbackSink : public BlockInterface{
+    private:
+        void (*callback)(f32_complex*, int count);
+        int execute() override;
+        int sampleCount;
+    public:
+
+        int init(void (*callback)(f32_complex*, int count), int sampleCount_i);
     };
 };
 

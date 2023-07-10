@@ -48,6 +48,7 @@ list(APPEND LINK_PROJECT_LIBRARY_LIST
 set(LINK_TESTS_LIST)
 list(APPEND LINK_TESTS_LIST
         Threads::Threads
+        python3.10
         )
 
 #Add the project library and application directories

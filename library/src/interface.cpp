@@ -26,15 +26,15 @@ int HAIRCUT::BlockInterface::initInterface(int inSamples, int outSamples){
 int HAIRCUT::BlockInterface::push(f32_complex* src, int count, int channel){
 
     int samplesToPush = count;
-    std::vector<std::thread> threads; // recursive calls will later be spllit off into new threads
-    threads.resize(0);
+    //std::vector<std::thread> threads; // recursive calls will later be spllit off into new threads
+    //threads.resize(0);
     while(samplesToPush > 0){
         int batchSize = this->getBufferSpaceAvailable();
         if(batchSize > samplesToPush){
             batchSize = samplesToPush;
         }
         PLOGD.printf("Object %016X: Pushing %i samples. of %i remaining", this, batchSize, samplesToPush);
-        memcpy(inBuffer[channel].buffer + inBuffer[channel].occupation, src, batchSize); // completely fill input buffer
+        memcpy(inBuffer[channel].buffer + inBuffer[channel].occupation, src, batchSize * sizeof(f32_complex)); // completely fill input buffer
         src += batchSize;
         inBuffer[channel].occupation += batchSize;
         samplesToPush -= batchSize;
@@ -60,6 +60,7 @@ int HAIRCUT::BlockInterface::push(f32_complex* src, int count, int channel){
 //            for (auto& t : threads) {
 //                t.join();
 //            }
+
             if (!this->execute()) { // execute processing of samples to make room for the next batch
                 PLOGE.printf("Object %016X: process execution failed.");
                 return 0;// return fail if execute processing failed
