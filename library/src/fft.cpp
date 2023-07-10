@@ -44,16 +44,7 @@ int HAIRCUT::FFT::init(int size, int batchSize, bool inverse) {
     return 1;
 }
 int HAIRCUT::FFT::execute()  {
-//    if(getBufferSpaceAvailable() < fftSize){
-//        PLOGD.printf("Object %016X: Output buffer full. Pushing to next stage. %i downstream blocks", this, destinationBlock.size());
-//        for(int i = 0; i < destinationBlock.size(); ++i){
-//            if(!destinationBlock[i]->push(outBuffer.buffer, fftSize)){
-//                PLOGE.printf("Object %016X: Pushing samples failed.");
-//                return 0;
-//            }
-//        }
-//        outBuffer.occupation -= fftSize;
-//    }
+    PLOGD.printf("Object %016X: Execute FFT", this);
 
     fftwf_execute(fftPlan); // execute fftw has no return
     outBuffer[0].occupation += fftSize;

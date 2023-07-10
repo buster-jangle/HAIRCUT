@@ -80,7 +80,6 @@ public:
     bool init(plog::IAppender* appender, plog::Severity severity = plog::debug);
 
     class FFT : public BlockInterface{
-
     private:
         int fftSize;
         fftwf_plan fftPlan;
@@ -92,6 +91,26 @@ public:
         /// \param batchSize number of batches to operate on at a time. A seperate thread is created for each batch, so multiple batches is advantageous for multithreading
         /// \param inverse If true, an inverse fft will be performed
         int init(int size, int batchSize = 1, bool inverse = false);
+    };
+
+    class resample : public BlockInterface{
+    private:
+        int inputSize;
+        int outputSize;
+
+        fftwf_plan fftForward;
+        f32_complex* forwardOutBuffer;
+        f32_complex* inverseInBuffer;
+        fftwf_plan fftInverse;
+
+
+
+
+        int execute() override;
+        //int inChannels = 2;
+    public:
+
+        int init(int inputSize, int outputSize, int batchSize = 1);
     };
 };
 
