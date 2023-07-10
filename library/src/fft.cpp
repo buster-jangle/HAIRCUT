@@ -21,19 +21,19 @@ int HAIRCUT::FFT::init(int size, int batchSize, bool inverse) {
     fftw_plan_with_nthreads(8);
     fftPlan = fftwf_plan_dft_1d(
             size, // number of fft bins
-            (fftwf_complex*)inBuffer.buffer,
-            (fftwf_complex*)outBuffer.buffer,
+            (fftwf_complex*)inBuffer[0].buffer,
+            (fftwf_complex*)outBuffer[0].buffer,
             fftSign,
             FFTW_PATIENT
     );
     fftwPlannerMutex.unlock();
 
     /// Perform sanity checks. Return false if any created pointer is null
-    if(!inBuffer.buffer){
+    if(!inBuffer[0].buffer){
         PLOGE.printf("Created inBuffer failed");
         return 0;
     }
-    if(!outBuffer.buffer){
+    if(!outBuffer[0].buffer){
         PLOGE.printf("Created outBuffer failed");
         return 0;
     }
@@ -44,19 +44,19 @@ int HAIRCUT::FFT::init(int size, int batchSize, bool inverse) {
     return 1;
 }
 int HAIRCUT::FFT::execute()  {
-    if(getBufferSpaceAvailable() < fftSize){
-        PLOGD.printf("Object %016X: Output buffer full. Pushing to next stage. %i downstream blocks", this, destinationBlock.size());
-        for(int i = 0; i < destinationBlock.size(); ++i){
-            if(!destinationBlock[i]->push(outBuffer.buffer, fftSize)){
-                PLOGE.printf("Object %016X: Pushing samples failed.");
-                return 0;
-            }
-        }
-        outBuffer.occupation -= fftSize;
-    }
+//    if(getBufferSpaceAvailable() < fftSize){
+//        PLOGD.printf("Object %016X: Output buffer full. Pushing to next stage. %i downstream blocks", this, destinationBlock.size());
+//        for(int i = 0; i < destinationBlock.size(); ++i){
+//            if(!destinationBlock[i]->push(outBuffer.buffer, fftSize)){
+//                PLOGE.printf("Object %016X: Pushing samples failed.");
+//                return 0;
+//            }
+//        }
+//        outBuffer.occupation -= fftSize;
+//    }
 
     fftwf_execute(fftPlan); // execute fftw has no return
-    outBuffer.occupation += fftSize;
-    inBuffer.occupation -= fftSize;
+    outBuffer[0].occupation += fftSize;
+    inBuffer[0].occupation -= fftSize; // udate buffer occupation according to how much data the operaton serviced
     return 1;
 }

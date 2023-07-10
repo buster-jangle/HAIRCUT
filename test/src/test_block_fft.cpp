@@ -63,12 +63,12 @@ int main(int argc, char *argv[]){
     if(!fftBlock2.init(512, 1)){
         fail();
     }
-    if(!fftBlock3.init(4096, 1)){
+    if(!fftBlock3.init(3999, 1)){
         fail();
     }
 
-    fftBlock.destinationBlock.push_back(&fftBlock2); // set fftBlock's destination as fftBlock2
-    fftBlock2.destinationBlock.push_back(&fftBlock3); // set destination for fftBlock2 to fftBlock3
+    fftBlock.outBuffer->connection.push_back(&fftBlock2); // set fftBlock's destination as fftBlock2
+    fftBlock2.outBuffer->connection.push_back(&fftBlock3); // set destination for fftBlock2 to fftBlock3
 
     /// Push in an oversized batch
     fftBlock.push(testDataset, SAMPLE_COUNT);

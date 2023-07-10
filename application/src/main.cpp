@@ -42,7 +42,7 @@ using namespace std; // default namespace
 float baseFrequency = 915.0e6;
 float samplesPerSecond =1e6; // Glitches occur in TX signal at less than 3e6 for unknown reasons
 float txGain = 30; // in decibels
-int codeLength = (1024*16);
+int codeLength = (1024*256);
 int interpolationFactor = 1;
 uint32_t seed = 0x1BADA551;
 

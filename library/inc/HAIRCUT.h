@@ -16,6 +16,8 @@
 
 using namespace std; // default namespace
 
+class HAIRCUT;
+
 static mutex fftwPlannerMutex; // FFTW planner is not threadsafe by design. This mutex allows only one running instance of FFTW_plan
 
 typedef struct f32_complex{
@@ -23,19 +25,22 @@ typedef struct f32_complex{
     volatile float imag;
 } f32_complex;
 
-typedef struct sampleBuffer{
-    f32_complex* buffer;
-    int occupation;
-    int size;
-} sampleBuffer_t;
-
 class HAIRCUT{
-    //class BlockInterface;
+    class BlockInterface;
+
+    typedef struct sampleBuffer{
+        f32_complex* buffer;
+        int occupation;
+        int size;
+        vector<BlockInterface*> connection;  // pointer to either upstream or downstream sink/source
+    } sampleBuffer_t;
+
     class BlockInterface {
     public:
-        sampleBuffer_t inBuffer;
-        sampleBuffer_t outBuffer;
-
+        int inChannels = 1;
+        int outChannels = 1;
+        sampleBuffer_t* inBuffer;
+        sampleBuffer_t* outBuffer;
     public:
         int initInterface(int inSamples, int outSamples);
 
@@ -43,23 +48,23 @@ class HAIRCUT{
         /// \param src pointer to complex float samples
         /// \param count number of samples to give
         /// \return number of samples actually taken in
-        int push(f32_complex* src, int count);
+        int push(f32_complex* src, int count, int channel = 0);
 
         /// Function to get samples from the DSP block
         /// \param dest pointer to a complex float sample buffer
         /// \param count number of samples requested
         /// \return number of samples actually transferred
-        int pull(f32_complex* dest, int count);
+        int pull(f32_complex* dest, int count, int channel = 0);
 
         /// Gets number of samples available in the output buffer
-        inline int getNumSamplesAvailable(){return outBuffer.occupation;};
+        inline int getNumSamplesAvailable(int channel = 0){return outBuffer[channel].occupation;};
         /// Gets number of samples available in the input buffer
-        inline int getBufferSpaceAvailable(){return inBuffer.size - inBuffer.occupation;};
+        inline int getBufferSpaceAvailable(int channel = 0){return inBuffer[channel].size - inBuffer[channel].occupation;};
 
-        /// If size of vector is greater than zero and this DSP block requires multiple input streams, samples for this block will be obtained by calling sourceBlock->output() for each dsp block pointer in the list
-        vector<BlockInterface*> sourceBlock;
-        /// If size of vector is greater than zero, samples will be outputted from this block by calling destinationBlock->input() for each dsp block pointer in the list
-        vector<BlockInterface*> destinationBlock;
+//        /// If size of vector is greater than zero and this DSP block requires multiple input streams, samples for this block will be obtained by calling sourceBlock->output() for each dsp block pointer in the list
+//        vector<BlockInterface*> sourceBlock;
+//        /// If size of vector is greater than zero, samples will be outputted from this block by calling destinationBlock->input() for each dsp block pointer in the list
+//        vector<BlockInterface*> destinationBlock;
 
         virtual int execute() = 0;
     };
@@ -80,6 +85,7 @@ public:
         int fftSize;
         fftwf_plan fftPlan;
         int execute() override;
+        //int inChannels = 2;
     public:
         /// Initialize this DSP block as an FFT block.
         /// \param size Fourrier transform size
