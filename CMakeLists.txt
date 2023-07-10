@@ -1,11 +1,28 @@
 
-cmake_minimum_required (VERSION 2.8.13)
-project("HAIRCUT")
+#cmake_minimum_required (VERSION 2.8.13)
+#project("HAIRCUT")
+cmake_minimum_required (VERSION 3.0.0)
+#Set your project name and verison here
+project("HAIRCUT"
+        VERSION 1.0.1
+        LANGUAGES CXX
+        DESCRIPTION "Put a one-liner description of your project here, and it will be included in documentation"
+        )
+#Add submodule directory first. Adding it later will override the following CPack options
+add_subdirectory(submodule)
 
-#Enable testing with CTest
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    include(CTest)
-endif()
+set(CMAKE_EXTRA_SCRIPT_DIR ${PROJECT_SOURCE_DIR}/cmake/)
+include(${CMAKE_EXTRA_SCRIPT_DIR}/options.cmake)
+include(${CMAKE_EXTRA_SCRIPT_DIR}/set_release.cmake)
+include(${CMAKE_EXTRA_SCRIPT_DIR}/config_doxygen.cmake)
+
+#Include submodule headers
+include_directories(${CMAKE_CURRENT_LIST_DIR}/submodule/plog/include)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/submodule/CLI11/include)
+#include project library header
+include_directories(${CMAKE_CURRENT_LIST_DIR}/library/inc/)
+#include project application headers
+include_directories(${CMAKE_CURRENT_LIST_DIR}/application/inc/)
 
 #Define install paths
 set(LIBRARY_INSTALL_PATH "/usr/local/lib")
@@ -13,57 +30,40 @@ set(HEADER_INSTALL_PATH "/usr/local/include")
 set(PRIMARY_EXECUTABLE_INSTALL_PATH "/usr/local/bin")
 #set(TEST_EXECUTABLE_INSTALL_PATH)
 
-#Automatically pull/update submodules before adding submodules directory
-find_package(Git QUIET)
+### List of libraries to link the project application to
+set(LINK_APPLICATION_LIST)
+list(APPEND LINK_APPLICATION_LIST
+        Threads::Threads
+        )
+find_package(Threads) #Almost all projects should have multithreading
+### List of libraries to link the project library to
+set(LINK_PROJECT_LIBRARY_LIST)
+list(APPEND LINK_PROJECT_LIBRARY_LIST
+        Threads::Threads
+        fftw3_threads
+        fftw3f
+        -lm
+        )
+### List of libraries to link the tests to
+set(LINK_TESTS_LIST)
+list(APPEND LINK_TESTS_LIST
+        Threads::Threads
+        )
 
-##### Update submodules before adding them as subdirectories
-if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-    # Update submodules as needed
-    option(GIT_SUBMODULE "Check submodules during build" ON)
-    if(GIT_SUBMODULE)
-        message(STATUS "Submodule update")
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                RESULT_VARIABLE GIT_SUBMOD_RESULT)
-        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-            message(FATAL_ERROR "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
-        endif()
-    endif()
-endif()
-#Add submodule directory after updating
-add_subdirectory(submodule)
-
-#Include submodule headers
-include_directories(${CMAKE_CURRENT_LIST_DIR}/submodule/plog/include)
-include_directories(${CMAKE_CURRENT_LIST_DIR}/submodule/CLI11/include)
-
-
+#Add the project library and application directories
 add_subdirectory(library)
-include_directories(${CMAKE_CURRENT_LIST_DIR}/library/inc/)
 add_subdirectory(application)
 
-add_subdirectory(test)
+# Optionally include and build tests if this is the main project, and BUILD_TEST is enabled (ON by default)
+if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND BUILD_TEST)
+    message(STATUS "Building tests.")
+    #Enable testing with CTest
+    include(CTest)
+    add_subdirectory(test)
+endif()
 
-#Doxygen section
-#First we can indicate the documentation build as an option and set it to ON by default
-option(BUILD_DOC "Build documentation" ON)
-# check if Doxygen is installed
-find_package(Doxygen)
-if (DOXYGEN_FOUND)
-    # set input and output files
-    set(DOXYGEN_IN ${CMAKE_CURRENT_LIST_DIR}/docs/Doxyfile.in)
-    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
-    # request to configure the file
-    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-    message("Doxygen build started")
+include(${CMAKE_EXTRA_SCRIPT_DIR}/config_cpack.cmake)
 
-    # note the option ALL which allows to build the docs together with the application
-    add_custom_target( doc_doxygen ALL
-            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-            COMMENT "Generating API documentation with Doxygen"
-            VERBATIM )
-else (DOXYGEN_FOUND)
-    message("Doxygen need to be installed to generate the doxygen documentation")
-endif (DOXYGEN_FOUND)
+
+
